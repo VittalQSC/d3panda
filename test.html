@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <!--<link href="../build/nv.d3.css" rel="stylesheet" type="text/css">-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.css" rel="stylesheet" type="text/css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js" charset="utf-8"></script>
+    <!--<script src="../build/nv.d3.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.5/nv.d3.js"></script>
+
+    <style>
+        text {
+            font: 12px sans-serif;
+        }
+        svg {
+            display: block;
+        }
+        html, body, #chart1, svg {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="gallery" id="chart1">
+    <svg></svg>
+</div>
+
+<script>
+var line1Y = 90, 
+    line2Y = 160; 
+      
+var createLines = (function (line1Y, line2Y) {
+
+    var configStroke = {
+        line1: "5,5",
+        line2: "2,5"
+    } 
+    
+    var q2_value;
+
+    function createLine(y, line) {
+        var median = d3.select('.nv-boxplot-median');
+        var bp = d3.select('.nv-boxplot');
+        var delta = +median.attr('y2') - q2_value;
+        d3.select('.nv-boxplot').append('line')
+                    .attr('x1', +d3.select('.nv-boxplot-median').attr('x1') - 15)
+                    .attr('x2', +d3.select('.nv-boxplot-median').attr('x2') + 15)
+                    .attr('y1', y + delta)
+                    .attr('y2', y + delta)
+                    .attr('class', 'nv-boxplot-median')
+                    .style("stroke-dasharray",configStroke[line])//dashed array for line        
+    }    
+
+
+    var createLine1 = function (value) {
+        setTimeout(function() {
+            createLine(value, "line1")
+        }, 50)
+    }
+
+    var createLine2 = function (value) {
+        setTimeout(function() {
+            createLine(value, "line2")
+        }, 50)
+    }
+
+    nv.addGraph(function() {
+      var chart = nv.models.boxPlotChart()
+          .x(function(d) { return d.label })
+          .staggerLabels(true)
+          .maxBoxWidth(75) // prevent boxes from being incredibly wide
+          .yDomain([0, 500])
+          ;
+      d3.select('#chart1 svg')
+          .datum(exampleData())
+          .call(chart);
+      nv.utils.windowResize(chart.update);
+      window.chart = chart;
+      return chart;
+    });
+
+    function exampleData() {
+     q1_value = 35  
+     q2_value = 150  
+     q3_value = 410  
+     return  [
+        {
+          label: "Sample A",
+          values: {
+            Q1: q1_value,
+            Q2: q2_value,
+            Q3: q3_value,
+            whisker_low: 20,
+            whisker_high: 490,
+          },
+        },
+      ];
+    }
+
+    createLine1(line1Y);
+    createLine2(line2Y);
+})(line1Y, line2Y)
+
+</script>
+
+</body>
+</html>
